@@ -1,43 +1,26 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
 
+// Mock data for workspaces
+const mockWorkspaces = [
+  { id: 1, name: 'TechHub', location: 'San Francisco' },
+  { id: 2, name: 'CreativeCorner', location: 'New York' },
+  { id: 3, name: 'InnovationLab', location: 'London' },
+];
+
 export default function Dashboard() {
-  const [user, setUser] = useState(null);
   const [workspaces, setWorkspaces] = useState([]);
 
   useEffect(() => {
-    fetchUser();
-    fetchWorkspaces();
+    // Simulating an API call with setTimeout
+    setTimeout(() => {
+      setWorkspaces(mockWorkspaces);
+    }, 1000);
   }, []);
-
-  async function fetchUser() {
-    const { data: { user } } = await supabase.auth.getUser();
-    setUser(user);
-  }
-
-  async function fetchWorkspaces() {
-    if (!user) return;
-
-    const { data, error } = await supabase
-      .from('workspaces')
-      .select('*')
-      .eq('userId', user.id);
-
-    if (error) {
-      console.error('Error fetching workspaces:', error);
-    } else {
-      setWorkspaces(data);
-    }
-  }
-
-  if (!user) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <div className="space-y-6">
