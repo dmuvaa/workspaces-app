@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import WorkspaceList from '@/components/WorkspaceList';
@@ -20,7 +20,7 @@ interface Filters {
   officeTypes: string[];
 }
 
-export default function SearchResults() {
+function SearchResults() {
   const searchParams = useSearchParams();
   const query = searchParams.get('q') || '';
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
@@ -123,5 +123,13 @@ export default function SearchResults() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<p>Loading search results...</p>}>
+      <SearchResults />
+    </Suspense>
   );
 }
