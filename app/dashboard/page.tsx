@@ -5,15 +5,22 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
 
+// Define type for workspace
+type Workspace = {
+  id: number;
+  name: string;
+  location: string;
+};
+
 // Mock data for workspaces
-const mockWorkspaces = [
+const mockWorkspaces: Workspace[] = [
   { id: 1, name: 'TechHub', location: 'San Francisco' },
   { id: 2, name: 'CreativeCorner', location: 'New York' },
   { id: 3, name: 'InnovationLab', location: 'London' },
 ];
 
 export default function Dashboard() {
-  const [workspaces, setWorkspaces] = useState([]);
+  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
 
   useEffect(() => {
     // Simulating an API call with setTimeout
@@ -27,7 +34,7 @@ export default function Dashboard() {
       <h1 className="text-3xl font-bold">Dashboard</h1>
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold">Your Workspaces</h2>
-        <Link href="/dashboard/new-workspace">
+        <Link href="/dashboard/new-workspace" passHref>
           <Button>Add New Workspace</Button>
         </Link>
       </div>
@@ -39,7 +46,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground mb-2">{workspace.location}</p>
-              <Link href={`/dashboard/workspace/${workspace.id}`}>
+              <Link href={`/dashboard/workspace/${workspace.id}`} passHref>
                 <Button variant="outline">Manage</Button>
               </Link>
             </CardContent>

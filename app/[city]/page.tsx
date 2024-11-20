@@ -1,9 +1,12 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import WorkspaceList from '@/components/WorkspaceList';
 
 type Props = {
-  params: { city: string }
+  params: { city: string };
 };
+
+// Helper function to generate slugs for city names
+const toSlug = (city: string): string => city.toLowerCase().replace(/\s+/g, '-');
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (params.city === 'favicon.ico') {
@@ -15,7 +18,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function CityWorkspaces({ params }: Props) {
+export default function CityWorkspaces({ params }: Props): JSX.Element | null {
   if (params.city === 'favicon.ico') {
     return null; // Return null for favicon.ico
   }
@@ -27,16 +30,16 @@ export default function CityWorkspaces({ params }: Props) {
   );
 }
 
-export async function generateStaticParams() {
-  // Fetch popular cities from your database or a predefined list
-  const popularCities = ['New York', 'London', 'Tokyo', 'Paris', 'Berlin'];
+export async function generateStaticParams(): Promise<Array<{ city: string }>> {
+  // Fetch popular cities from your database or use a predefined list
+  const popularCities: readonly string[] = ['New York', 'London', 'Tokyo', 'Paris', 'Berlin'] as const;
 
   // Add special cases for the "new-workspace" route and favicon.ico
   return [
     { city: 'new-workspace' },
-    { city: 'favicon.ico' }, // Add favicon.ico to the list of paths
+    { city: 'favicon.ico' }, // Handle favicon.ico path
     ...popularCities.map((city) => ({
-      city: city.toLowerCase().replace(' ', '-'),
+      city: toSlug(city),
     })),
   ];
 }

@@ -13,17 +13,31 @@ export default function Contact() {
     message: '',
   });
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement form submission logic (e.g., send to an API endpoint)
-    console.log('Form submitted:', formData);
-    alert('Thank you for your message. We will get back to you soon!');
-    setFormData({ name: '', email: '', message: '' });
+
+    // Validate form data
+    if (!formData.name || !formData.email || !formData.message) {
+      alert('Please fill in all fields.');
+      return;
+    }
+
+    try {
+      // TODO: Implement form submission logic (e.g., send to an API endpoint)
+      console.log('Form submitted:', formData);
+      alert('Thank you for your message. We will get back to you soon!');
+
+      // Reset form after successful submission
+      setFormData({ name: '', email: '', message: '' });
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('Something went wrong. Please try again.');
+    }
   };
 
   return (
@@ -38,6 +52,7 @@ export default function Contact() {
             value={formData.name}
             onChange={handleChange}
             required
+            placeholder="Your Name"
           />
         </div>
         <div>
@@ -49,6 +64,7 @@ export default function Contact() {
             value={formData.email}
             onChange={handleChange}
             required
+            placeholder="your.email@example.com"
           />
         </div>
         <div>
@@ -59,6 +75,7 @@ export default function Contact() {
             value={formData.message}
             onChange={handleChange}
             required
+            placeholder="Write your message here..."
           />
         </div>
         <Button type="submit">Send Message</Button>

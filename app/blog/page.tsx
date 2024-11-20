@@ -2,14 +2,27 @@ import { client } from '@/lib/sanity';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-async function getPosts() {
-  return await client.fetch(`*[_type == "post"] {
-    _id,
-    title,
-    slug,
-    publishedAt,
-    excerpt
-  }`);
+interface Post {
+  _id: string;
+  title: string;
+  slug: { current: string };
+  publishedAt: string;
+  excerpt: string;
+}
+
+async function getPosts(): Promise<Post[]> {
+  try {
+    return await client.fetch(`*[_type == "post"] {
+      _id,
+      title,
+      slug,
+      publishedAt,
+      excerpt
+    }`);
+  } catch (error) {
+    console.error('Error fetching posts:', error);
+    return [];
+  }
 }
 
 export default async function Blog() {
@@ -30,7 +43,11 @@ export default async function Blog() {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground mb-2">
-                {new Date(post.publishedAt).toLocaleDateString()}
+                {new Date(post.publishedAt).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric',
+                })}
               </p>
               <p>{post.excerpt}</p>
             </CardContent>
