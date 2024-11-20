@@ -7,4 +7,9 @@ const nextConfig = {
   images: { unoptimized: true },
 };
 
-module.exports = nextConfig;
+// next.config.js
+module.exports = {
+  experimental: {
+    // Remove any invalid or unnecessary keys
+  },
+};

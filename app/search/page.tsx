@@ -111,7 +111,7 @@ function SearchResults() {
         </div>
       </div>
       <div className="w-3/4">
-        <h1 className="text-3xl font-bold mb-6">Search Results for "{query}"</h1>
+        <h1 className="text-3xl font-bold mb-6">Search Results for &quot;{query}&quot;</h1>
         {loading ? (
           <p>Loading...</p>
         ) : error ? (
