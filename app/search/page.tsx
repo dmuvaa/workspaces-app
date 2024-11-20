@@ -8,48 +8,68 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 
+interface Workspace {
+  id: number;
+  name: string;
+  amenities: string[];
+  officeTypes: string[];
+}
+
+interface Filters {
+  amenities: string[];
+  officeTypes: string[];
+}
+
 export default function SearchResults() {
   const searchParams = useSearchParams();
-  const query = searchParams.get('q');
-  const [workspaces, setWorkspaces] = useState([]);
-  const [filters, setFilters] = useState({
-    amenities: [],
-    officeTypes: [],
-  });
+  const query = searchParams.get('q') || '';
+  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
+  const [filters, setFilters] = useState<Filters>({ amenities: [], officeTypes: [] });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchWorkspaces();
+    const timeout = setTimeout(fetchWorkspaces, 300); // Debounced fetch
+    return () => clearTimeout(timeout);
   }, [query, filters]);
 
-  async function fetchWorkspaces() {
-    let supabaseQuery = supabase
-      .from('workspaces')
-      .select('*')
-      .ilike('name', `%${query}%`);
+  async function fetchWorkspaces(): Promise<void> {
+    setLoading(true);
+    setError(null);
 
-    if (filters.amenities.length > 0) {
-      supabaseQuery = supabaseQuery.contains('amenities', filters.amenities);
-    }
+    try {
+      let supabaseQuery = supabase
+        .from('workspaces')
+        .select('*')
+        .ilike('name', `%${query}%`);
 
-    if (filters.officeTypes.length > 0) {
-      supabaseQuery = supabaseQuery.contains('officeTypes', filters.officeTypes);
-    }
+      if (filters.amenities.length > 0) {
+        supabaseQuery = supabaseQuery.contains('amenities', filters.amenities);
+      }
 
-    const { data, error } = await supabaseQuery;
+      if (filters.officeTypes.length > 0) {
+        supabaseQuery = supabaseQuery.contains('officeTypes', filters.officeTypes);
+      }
 
-    if (error) {
-      console.error('Error fetching workspaces:', error);
-    } else {
-      setWorkspaces(data);
+      const { data, error } = await supabaseQuery;
+
+      if (error) throw error;
+
+      setWorkspaces(data || []);
+    } catch (err) {
+      console.error('Error fetching workspaces:', err);
+      setError('Failed to fetch workspaces. Please try again later.');
+    } finally {
+      setLoading(false);
     }
   }
 
-  const handleFilterChange = (category, value) => {
-    setFilters(prevFilters => ({
+  const handleFilterChange = (category: keyof Filters, value: string) => {
+    setFilters((prevFilters) => ({
       ...prevFilters,
       [category]: prevFilters[category].includes(value)
-        ? prevFilters[category].filter(item => item !== value)
-        : [...prevFilters[category], value]
+        ? prevFilters[category].filter((item) => item !== value)
+        : [...prevFilters[category], value],
     }));
   };
 
@@ -60,27 +80,31 @@ export default function SearchResults() {
         <div className="space-y-4">
           <div>
             <Label className="text-lg">Amenities</Label>
-            {['WiFi', 'Meeting Rooms', 'Parking', 'Coffee'].map(amenity => (
+            {['WiFi', 'Meeting Rooms', 'Parking', 'Coffee'].map((amenity) => (
               <div key={amenity} className="flex items-center">
                 <Checkbox
                   id={`amenity-${amenity}`}
                   checked={filters.amenities.includes(amenity)}
                   onCheckedChange={() => handleFilterChange('amenities', amenity)}
                 />
-                <label htmlFor={`amenity-${amenity}`} className="ml-2">{amenity}</label>
+                <label htmlFor={`amenity-${amenity}`} className="ml-2">
+                  {amenity}
+                </label>
               </div>
             ))}
           </div>
           <div>
             <Label className="text-lg">Office Types</Label>
-            {['Private Office', 'Open Space', 'Meeting Room', 'Virtual Office'].map(type => (
+            {['Private Office', 'Open Space', 'Meeting Room', 'Virtual Office'].map((type) => (
               <div key={type} className="flex items-center">
                 <Checkbox
                   id={`type-${type}`}
                   checked={filters.officeTypes.includes(type)}
                   onCheckedChange={() => handleFilterChange('officeTypes', type)}
                 />
-                <label htmlFor={`type-${type}`} className="ml-2">{type}</label>
+                <label htmlFor={`type-${type}`} className="ml-2">
+                  {type}
+                </label>
               </div>
             ))}
           </div>
@@ -88,7 +112,15 @@ export default function SearchResults() {
       </div>
       <div className="w-3/4">
         <h1 className="text-3xl font-bold mb-6">Search Results for "{query}"</h1>
-        <WorkspaceList workspaces={workspaces} />
+        {loading ? (
+          <p>Loading...</p>
+        ) : error ? (
+          <p className="text-red-500">{error}</p>
+        ) : workspaces.length === 0 ? (
+          <p>No workspaces match your search criteria.</p>
+        ) : (
+          <WorkspaceList city={query} />
+        )}
       </div>
     </div>
   );
