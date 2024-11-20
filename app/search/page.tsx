@@ -28,12 +28,7 @@ function SearchResults() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const timeout = setTimeout(fetchWorkspaces, 300); // Debounced fetch
-    return () => clearTimeout(timeout);
-  }, [query, filters]);
-
-  async function fetchWorkspaces(): Promise<void> {
+  const fetchWorkspaces = useCallback(async (): Promise<void> => {
     setLoading(true);
     setError(null);
 
@@ -62,7 +57,12 @@ function SearchResults() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [query, filters]);
+
+  useEffect(() => {
+    const timeout = setTimeout(fetchWorkspaces, 300); // Debounced fetch
+    return () => clearTimeout(timeout);
+  }, [fetchWorkspaces]);
 
   const handleFilterChange = (category: keyof Filters, value: string) => {
     setFilters((prevFilters) => ({
