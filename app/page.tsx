@@ -1,5 +1,3 @@
-// app/page.tsx
-
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -9,13 +7,20 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { MapPin, Star, Coffee, Wifi, Users, Clock } from 'lucide-react';
 
+const workspaces = [
+  {name: "TechHub", location: "San Francisco", image: "/images/techhub.jpg"},
+  {name: "CreativeCorner", location: "New York", image: "/images/creativecorner.jpg"},
+  {name: "InnovationLab", location: "London", image: "/images/innovationlab.jpg"},
+  {name: "ZenOffice", location: "Tokyo", image: "/images/zenoffice.jpg"},
+];
+
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
       <section className="relative h-[600px] flex items-center justify-center text-white">
         <Image
-          src="https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80"
+          src="/images/hero-image.jpg"
           alt="Coworking Space"
           fill
           style={{objectFit: "cover"}}
@@ -70,12 +75,7 @@ export default function Home() {
           <section className="w-full md:w-3/4">
             <h2 className="text-3xl font-bold mb-6">Featured Workspaces</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {[
-                {name: "TechHub", location: "San Francisco", image: "https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80"},
-                {name: "CreativeCorner", location: "New York", image: "https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80"},
-                {name: "InnovationLab", location: "London", image: "https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80"},
-                {name: "ZenOffice", location: "Tokyo", image: "https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80"},
-              ].map((workspace) => (
+              {workspaces.map((workspace) => (
                 <Card key={workspace.name}>
                   <Image src={workspace.image} alt={workspace.name} width={400} height={200} className="rounded-t-lg" />
                   <CardContent className="p-4">
