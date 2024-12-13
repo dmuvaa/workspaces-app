@@ -8,26 +8,84 @@ datasource db {
 }
 
 model User {
-  id            String      @id @default(cuid())
-  email         String      @unique
-  name          String?
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-  workspaces    Workspace[]
+  id          String       @id @default(cuid())
+  email       String       @unique
+  password    String
+  name        String?
+  role        Role         @default(USER)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  workspaces  Workspace[]
+  reviews     Review[]
 }
 
 model Workspace {
-  id          String    @id @default(cuid())
+  id          String       @id @default(cuid())
   name        String
   description String
-  location    String
-  amenities   String[]
+  locationId  String
+  location    Location      @relation(fields: [locationId], references: [id])
+  amenities   Amenity[]     @relation("WorkspaceAmenities")
   officeTypes String[]
   pricing     Json
   contacts    Json
   images      String[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  reviews     Review[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
   userId      String
-  user        User      @relation(fields: [userId], references: [id])
+  user        User          @relation(fields: [userId], references: [id])
+  featured    Boolean       @default(false) // New Field
+}
+
+model Location {
+  id          String      @id @default(cuid())
+  address     String
+  cityId      String
+  city        City        @relation(fields: [cityId], references: [id])
+  workspaces  Workspace[]
+}
+
+model City {
+  id          String      @id @default(cuid())
+  name        String
+  countryId   String
+  country     Country     @relation(fields: [countryId], references: [id])
+  locations   Location[]
+}
+
+model Country {
+  id          String      @id @default(cuid())
+  name        String
+  code        String      @unique
+  cities      City[]
+}
+
+model Amenity {
+  id          String      @id @default(cuid())
+  name        String
+  workspaces  Workspace[] @relation("WorkspaceAmenities")
+}
+
+model Review {
+  id          String      @id @default(cuid())
+  rating      Int         @min(1) @max(5)
+  comment     String?
+  workspaceId String
+  workspace   Workspace   @relation(fields: [workspaceId], references: [id])
+  userId      String
+  user        User        @relation(fields: [userId], references: [id])
+  createdAt   DateTime    @default(now())
+}
+
+model Role {
+  id          String      @id @default(cuid())
+  name        String      @unique
+  users       User[]
+}
+
+// ENUM for User Roles
+enum Role {
+  USER
+  ADMIN
 }
