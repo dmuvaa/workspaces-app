@@ -1,24 +1,29 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
-
-// Set the runtime directly
-export const runtime = 'experimental-edge';
+import { prisma } from '@/lib/prisma';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const city = searchParams.get('city');
+  const userId = searchParams.get('userId');
 
-  let query = supabase.from('workspaces').select('*');
-
-  if (city) {
-    query = query.ilike('location', `%${city}%`);
+  if (!userId) {
+    return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
   }
 
-  const { data, error } = await query;
+  try {
+    const workspaces = await prisma.workspace.findMany({
+      where: { userId },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        status: true,
+      },
+    });
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json(workspaces);
+  } catch (error) {
+    console.error('Error fetching workspaces:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
-
-  return NextResponse.json(data);
 }
+
