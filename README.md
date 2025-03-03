@@ -1,3 +1,3 @@
 # workspaces-app
 
-[Edit in StackBlitz next generation editor ⚡️](https://stackblitz.com/~/github.com/dmuvaa/workspaces-app)
+Home of the all coworking spaces in the world
